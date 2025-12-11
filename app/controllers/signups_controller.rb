@@ -3,6 +3,7 @@ class SignupsController < ApplicationController
   allow_unauthenticated_access
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_signup_path, alert: "Try again later." }
   before_action :redirect_authenticated_user
+  before_action :prevent_signup_when_users_exist
 
   layout "public"
 
@@ -26,5 +27,9 @@ class SignupsController < ApplicationController
 
     def signup_params
       params.expect signup: :email_address
+    end
+
+    def prevent_signup_when_users_exist
+      redirect_to new_session_url unless Account.accepting_signups?
     end
 end
